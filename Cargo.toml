@@ -1,0 +1,6 @@
+[package]
+name = "sdl2-engine-helpers"
+version = "0.0.1"
+authors = ["Tony Aldridge <zaragopha@hotmail.com>"]
+
+[dependencies]
