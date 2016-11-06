@@ -14,8 +14,8 @@ impl GameLoop {
         }
     }
 
-    pub fn run<F>(&mut self, fun: F)
-        where F: Fn(u64) -> bool {  //FIXME: Could be an enum or something
+    pub fn run<F>(&mut self, mut fun: F)
+        where F: FnMut(u64) -> bool {  //FIXME: Could be an enum or something
         let ns_per_frame : Duration = Duration::new(0, 1_000_000_000 / self.fps);
         'running: loop {
             let start = Instant::now();
