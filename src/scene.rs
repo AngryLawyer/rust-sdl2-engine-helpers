@@ -1,7 +1,8 @@
 pub type BoxedScene<SceneChangeParamsT, EngineDataT, EventT, RendererT> = Box<Scene<SceneChangeParamsT, EngineDataT, EventT, RendererT> + 'static>;
 
 pub trait Scene<SceneChangeParamsT, EngineDataT, EventT, RendererT> {
-    fn render(&self, renderer: &mut RendererT, engine_data: &mut EngineDataT);
+    fn render(&self, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64);
+    fn think(&self, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64);
     fn handle_event(&mut self, event: &EventT, renderer: &mut RendererT, &mut EngineDataT) -> Option<SceneChangeEvent<SceneChangeParamsT>>;
 }
 
@@ -41,11 +42,22 @@ impl<SceneChangeParamsT, EngineDataT, EventT, RendererT> SceneStack<SceneChangeP
         self.scenes.pop()
     }
 
-    pub fn render(&mut self, renderer: &mut RendererT, engine_data: &mut EngineDataT) {
+    pub fn think(&mut self, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64) {
         let maybe_last_scene = self.scenes.pop();
         match maybe_last_scene {
             Some(scene) => {
-                scene.render(renderer, engine_data);
+                scene.think(renderer, engine_data, tick);
+                self.scenes.push(scene);
+            },
+            None => ()
+        }
+    }
+
+    pub fn render(&mut self, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64) {
+        let maybe_last_scene = self.scenes.pop();
+        match maybe_last_scene {
+            Some(scene) => {
+                scene.render(renderer, engine_data, tick);
                 self.scenes.push(scene);
             },
             None => ()
