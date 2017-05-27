@@ -2,9 +2,10 @@ use std::time::{Duration, Instant};
 use std::thread::sleep;
 
 pub struct GameLoop {
+    // TODO: Think about including time information, separate think and render steps
     frame_number: u64,
     fps: u32
-}    
+}
 
 impl GameLoop {
     pub fn new(fps: u32) -> GameLoop {
