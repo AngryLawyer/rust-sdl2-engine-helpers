@@ -53,15 +53,28 @@ impl<EngineDataT, EventT, RendererT> SceneStack<EngineDataT, EventT, RendererT> 
         }
     }
 
-    pub fn handle_event(&mut self, event: &EventT, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64) -> Option<SceneChangeEvent<EngineDataT, EventT, RendererT>> {
+    pub fn handle_event(&mut self, event: &EventT, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64) {
         let maybe_last_scene = self.scenes.pop();
-        match maybe_last_scene {
+        let event = match maybe_last_scene {
             Some(mut scene) => {
                 let event = scene.handle_event(event, renderer, engine_data, tick);
                 self.scenes.push(scene);
                 event
             },
             None => None
-        }
+        };
+
+        match event {
+            Some(SceneChangeEvent::PushScene(callback)) => {
+                self.push(callback());
+            },
+            Some(SceneChangeEvent::SwapScene(callback)) => {
+                self.swap(callback());
+            },
+            Some(SceneChangeEvent::PopScene) => {
+                self.pop();
+            },
+            None => ()
+        };
     }
 }
