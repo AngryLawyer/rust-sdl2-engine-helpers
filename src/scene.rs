@@ -1,5 +1,5 @@
 pub type BoxedScene<EventT, RendererT, EngineDataT> = Box<Scene<EventT, RendererT, EngineDataT> + 'static>;
-pub type SceneChangeCallback<EventT, RendererT, EngineDataT> = Box<Fn() -> BoxedScene<EventT, RendererT, EngineDataT>>;
+pub type SceneChangeCallback<EventT, RendererT, EngineDataT> = Box<Fn(&mut RendererT, &mut EngineDataT) -> BoxedScene<EventT, RendererT, EngineDataT>>;
 
 pub trait Scene<EventT, RendererT, EngineDataT> {
     fn render(&self, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64);
@@ -66,10 +66,10 @@ impl<EventT, RendererT, EngineDataT> SceneStack<EventT, RendererT, EngineDataT> 
 
         match event {
             Some(SceneChangeEvent::PushScene(callback)) => {
-                self.push(callback());
+                self.push(callback(renderer, engine_data));
             },
             Some(SceneChangeEvent::SwapScene(callback)) => {
-                self.swap(callback());
+                self.swap(callback(renderer, engine_data));
             },
             Some(SceneChangeEvent::PopScene) => {
                 self.pop();
