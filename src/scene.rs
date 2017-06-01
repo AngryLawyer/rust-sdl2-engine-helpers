@@ -2,7 +2,7 @@ pub type BoxedScene<EventT, RendererT, EngineDataT> = Box<Scene<EventT, Renderer
 pub type SceneChangeCallback<EventT, RendererT, EngineDataT> = Box<Fn(&mut RendererT, &mut EngineDataT) -> BoxedScene<EventT, RendererT, EngineDataT>>;
 
 pub trait Scene<EventT, RendererT, EngineDataT> {
-    fn render(&self, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64);
+    fn render(&self, renderer: &mut RendererT, engine_data: &EngineDataT, tick: u64);
     fn handle_event(&mut self, event: &EventT, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64) -> Option<SceneChangeEvent<EventT, RendererT, EngineDataT>>;
 }
 
@@ -42,7 +42,7 @@ impl<EventT, RendererT, EngineDataT> SceneStack<EventT, RendererT, EngineDataT> 
         self.scenes.pop()
     }
 
-    pub fn render(&mut self, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64) {
+    pub fn render(&mut self, renderer: &mut RendererT, engine_data: &EngineDataT, tick: u64) {
         let maybe_last_scene = self.scenes.pop();
         match maybe_last_scene {
             Some(scene) => {
