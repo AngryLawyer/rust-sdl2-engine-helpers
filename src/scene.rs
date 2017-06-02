@@ -57,7 +57,10 @@ impl<EventT, RendererT, EngineDataT> SceneStack<EventT, RendererT, EngineDataT> 
     pub fn handle_event(&mut self, event: &EventT, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64) {
         let maybe_last_scene = self.scenes.pop();
         match maybe_last_scene {
-            Some(mut scene) => scene.handle_event(event, renderer, engine_data, tick),
+            Some(mut scene) => {
+                scene.handle_event(event, renderer, engine_data, tick);
+                self.scenes.push(scene);
+            },
             None => ()
         };
     }
