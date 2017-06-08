@@ -23,7 +23,7 @@ impl KeyHandler {
     }
 
     pub fn handle_event(&mut self, event: &Event) {
-        match event {
+        match *event {
             Event::KeyDown {keycode: Some(key), ..} => {
                 self.incoming.push((KeyState::Press, key));
             },
@@ -50,7 +50,7 @@ impl KeyHandler {
         self.incoming.clear();
     }
 
-    pub fn last_key(&mut self) -> Option<(Key, u64)> {
+    pub fn last_key(&mut self) -> Option<(Keycode, u64)> {
         match self.last_press {
             Some((key, timestamp)) => {
                 match self.keys.get(&key) {
@@ -69,10 +69,10 @@ impl KeyHandler {
     }
 
     pub fn is_pressed(&self, code: Keycode) -> bool {
-        self.keys.get(&key).is_some()
+        self.keys.get(&code).is_some()
     }
 
-    pub fn time_pressed(&self, code: Keycode) -> Option<u64> {
-        self.keys.get(&key)
+    pub fn time_pressed(&self, code: Keycode) -> Option<&u64> {
+        self.keys.get(&code)
     }
 }
