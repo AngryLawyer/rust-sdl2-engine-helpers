@@ -7,6 +7,7 @@ pub trait Scene<EventT, RendererT, EngineDataT, SceneChangeDataT> {
     fn think(&mut self, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64) -> Option<SceneChangeEvent<SceneChangeDataT>>;
 }
 
+#[derive(Debug, Copy, Clone)]
 pub enum SceneChangeEvent<SceneChangeDataT> {
     PushScene(SceneChangeDataT),
     SwapScene(SceneChangeDataT),
