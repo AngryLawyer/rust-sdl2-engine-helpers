@@ -1,4 +1,6 @@
 extern crate sdl2_engine_helpers;
+extern crate sdl2;
+use sdl2::render::WindowCanvas;
 use sdl2_engine_helpers::scene::{SceneStack, Scene, SceneChangeEvent, BoxedScene};
 
 pub struct Data {
@@ -14,22 +16,22 @@ pub struct DummyScene<'a> {
 }
 
 impl<'a> DummyScene<'a> {
-    pub fn new<'b>(first_arg: &Data, second_arg: &'a mut Data) -> BoxedScene<'a, (), (), BorrowedData<'b>, ()> {
+    pub fn new<'b>(first_arg: &Data, second_arg: &'a mut Data) -> BoxedScene<'a, (), (), BorrowedData<'b>> {
         Box::new(DummyScene {
             stored: second_arg
         })
     }
 }
 
-impl<'a, 'b> Scene<(), (), BorrowedData<'b>, ()> for DummyScene<'a> {
+impl<'a, 'b> Scene<(), (), BorrowedData<'b>> for DummyScene<'a> {
 
-    fn render(&self, renderer: &mut (), engine_data: &BorrowedData, tick: u64) {
+    fn render(&self, renderer: &mut WindowCanvas, engine_data: &BorrowedData, tick: u64) {
     }
 
-    fn handle_event(&mut self, event: &(), renderer: &mut (), engine_data: &mut BorrowedData, tick: u64) {
+    fn handle_event(&mut self, event: &(), engine_data: &mut BorrowedData, tick: u64) {
     }
 
-    fn think(&mut self, renderer: &mut (), engine_data: &mut BorrowedData, tick: u64) -> Option<SceneChangeEvent<()>> {
+    fn think(&mut self, engine_data: &mut BorrowedData, tick: u64) -> Option<SceneChangeEvent<()>> {
         None
     }
 }
@@ -49,5 +51,4 @@ fn correct_lifetimes_on_scene() {
     };
     let mut scene_stack = SceneStack::new();
     scene_stack.push(DummyScene::new(&d1, &mut d2));
-    scene_stack.render(&mut (), &borrow, 0);
 }

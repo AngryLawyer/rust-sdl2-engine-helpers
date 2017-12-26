@@ -1,26 +1,27 @@
-pub type BoxedScene<'a, EventT, RendererT, EngineDataT, SceneChangeDataT> = Box<Scene<EventT, RendererT, EngineDataT, SceneChangeDataT> + 'a>;
-pub type SceneChangeCallback<'a, EventT, RendererT, EngineDataT, SceneChangeDataT> = Fn(&SceneChangeDataT, &mut RendererT, &mut EngineDataT) -> BoxedScene<'a, EventT, RendererT, EngineDataT, SceneChangeDataT>;
+use sdl2::render::WindowCanvas;
 
-pub trait Scene<EventT, RendererT, EngineDataT, SceneChangeDataT> {
-    fn render(&self, renderer: &mut RendererT, engine_data: &EngineDataT, tick: u64);
-    fn handle_event(&mut self, event: &EventT, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64);
-    fn think(&mut self, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64) -> Option<SceneChangeEvent<SceneChangeDataT>>;
+pub type BoxedScene<'a, EventT, SceneChangeParamsT, EngineDataT> = Box<Scene<EventT, SceneChangeParamsT, EngineDataT> + 'a>;
+
+pub trait Scene<EventT, SceneChangeParamsT, EngineDataT> {
+    fn render(&self, renderer: &mut WindowCanvas, engine_data: &EngineDataT, tick: u64);
+    fn handle_event(&mut self, event: &EventT, engine_data: &mut EngineDataT, tick: u64);
+    fn think(&mut self, engine_data: &mut EngineDataT, tick: u64) -> Option<SceneChangeEvent<SceneChangeParamsT>>;
 }
 
 #[derive(Debug, Copy, Clone)]
-pub enum SceneChangeEvent<SceneChangeDataT> {
-    PushScene(SceneChangeDataT),
-    SwapScene(SceneChangeDataT),
+pub enum SceneChangeEvent<T> {
+    PushScene(T),
+    SwapScene(T),
     PopScene,
 }
 
-pub struct SceneStack<'a, EventT, RendererT, EngineDataT, SceneChangeDataT> {
-    scenes: Vec<BoxedScene<'a, EventT, RendererT, EngineDataT, SceneChangeDataT>>
+pub struct SceneStack<'a, EventT, SceneChangeParamsT, EngineDataT> {
+    scenes: Vec<BoxedScene<'a, EventT, SceneChangeParamsT, EngineDataT>>
 }
 
-impl<'a, EventT, RendererT, EngineDataT, SceneChangeDataT> SceneStack<'a, EventT, RendererT, EngineDataT, SceneChangeDataT> {
+impl<'a, EventT, SceneChangeParamsT, EngineDataT> SceneStack<'a, EventT, SceneChangeParamsT, EngineDataT> {
 
-    pub fn new() -> SceneStack<'a, EngineDataT, EventT, RendererT, SceneChangeDataT> {
+    pub fn new() -> SceneStack<'a, EventT, SceneChangeParamsT, EngineDataT> {
         SceneStack {
             scenes: vec![]
         }
@@ -30,21 +31,21 @@ impl<'a, EventT, RendererT, EngineDataT, SceneChangeDataT> SceneStack<'a, EventT
         self.scenes.len() == 0
     }
 
-    pub fn push(&mut self, scene: BoxedScene<'a, EventT, RendererT, EngineDataT, SceneChangeDataT>) {
+    pub fn push(&mut self, scene: BoxedScene<'a, EventT, SceneChangeParamsT, EngineDataT>) {
         self.scenes.push(scene)
     }
 
-    pub fn swap(&mut self, scene: BoxedScene<'a, EventT, RendererT, EngineDataT, SceneChangeDataT>) -> Option<BoxedScene<'a, EventT, RendererT, EngineDataT, SceneChangeDataT>> {
+    pub fn swap(&mut self, scene: BoxedScene<'a, EventT, SceneChangeParamsT, EngineDataT>) -> Option<BoxedScene<'a, EventT, SceneChangeParamsT, EngineDataT>> {
         let old_scene = self.scenes.pop();
         self.scenes.push(scene);
         old_scene
     }
 
-    pub fn pop(&mut self) -> Option<BoxedScene<'a, EventT, RendererT, EngineDataT, SceneChangeDataT>> {
+    pub fn pop(&mut self) -> Option<BoxedScene<'a, EventT, SceneChangeParamsT, EngineDataT>> {
         self.scenes.pop()
     }
 
-    pub fn render(&mut self, renderer: &mut RendererT, engine_data: &EngineDataT, tick: u64) {
+    pub fn render(&mut self, renderer: &mut WindowCanvas, engine_data: &mut EngineDataT, tick: u64) {
         let maybe_last_scene = self.scenes.pop();
         match maybe_last_scene {
             Some(scene) => {
@@ -55,39 +56,26 @@ impl<'a, EventT, RendererT, EngineDataT, SceneChangeDataT> SceneStack<'a, EventT
         }
     }
 
-    pub fn handle_event(&mut self, event: &EventT, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64) {
+    pub fn handle_event(&mut self, event: &EventT, engine_data: &mut EngineDataT, tick: u64) {
         let maybe_last_scene = self.scenes.pop();
         match maybe_last_scene {
             Some(mut scene) => {
-                scene.handle_event(event, renderer, engine_data, tick);
+                scene.handle_event(event, engine_data, tick);
                 self.scenes.push(scene);
             },
             None => ()
-        };
+        }
     }
 
-    pub fn think(&mut self, renderer: &mut RendererT, engine_data: &mut EngineDataT, tick: u64, scene_change_handler: &SceneChangeCallback<'a, EventT, RendererT, EngineDataT, SceneChangeDataT>) {
+    pub fn think(&mut self, engine_data: &mut EngineDataT, tick: u64)  -> Option<SceneChangeEvent<SceneChangeParamsT>> {
         let maybe_last_scene = self.scenes.pop();
-        let event = match maybe_last_scene {
+        match maybe_last_scene {
             Some(mut scene) => {
-                let event = scene.think(renderer, engine_data, tick);
+                let event = scene.think(engine_data, tick);
                 self.scenes.push(scene);
                 event
             },
             None => None
-        };
-
-        match event {
-            Some(SceneChangeEvent::PushScene(ref data)) => {
-                self.push(scene_change_handler(data, renderer, engine_data));
-            },
-            Some(SceneChangeEvent::SwapScene(ref data)) => {
-                self.swap(scene_change_handler(data, renderer, engine_data));
-            },
-            Some(SceneChangeEvent::PopScene) => {
-                self.pop();
-            },
-            None => ()
-        };
+        }
     }
 }
