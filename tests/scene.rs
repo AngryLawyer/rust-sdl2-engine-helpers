@@ -25,7 +25,7 @@ impl<'a> DummyScene<'a> {
 
 impl<'a, 'b> Scene<(), (), BorrowedData<'b>> for DummyScene<'a> {
 
-    fn render(&self, renderer: &mut WindowCanvas, engine_data: &BorrowedData, tick: u64) {
+    fn render(&mut self, renderer: &mut WindowCanvas, engine_data: &mut BorrowedData, tick: u64) {
     }
 
     fn handle_event(&mut self, event: &(), engine_data: &mut BorrowedData, tick: u64) {

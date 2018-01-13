@@ -3,7 +3,7 @@ use sdl2::render::WindowCanvas;
 pub type BoxedScene<'a, EventT, SceneChangeParamsT, EngineDataT> = Box<Scene<EventT, SceneChangeParamsT, EngineDataT> + 'a>;
 
 pub trait Scene<EventT, SceneChangeParamsT, EngineDataT> {
-    fn render(&self, renderer: &mut WindowCanvas, engine_data: &EngineDataT, tick: u64);
+    fn render(&mut self, renderer: &mut WindowCanvas, engine_data: &mut EngineDataT, tick: u64);
     fn handle_event(&mut self, event: &EventT, engine_data: &mut EngineDataT, tick: u64);
     fn think(&mut self, engine_data: &mut EngineDataT, tick: u64) -> Option<SceneChangeEvent<SceneChangeParamsT>>;
 }
@@ -48,7 +48,7 @@ impl<'a, EventT, SceneChangeParamsT, EngineDataT> SceneStack<'a, EventT, SceneCh
     pub fn render(&mut self, renderer: &mut WindowCanvas, engine_data: &mut EngineDataT, tick: u64) {
         let maybe_last_scene = self.scenes.pop();
         match maybe_last_scene {
-            Some(scene) => {
+            Some(mut scene) => {
                 scene.render(renderer, engine_data, tick);
                 self.scenes.push(scene);
             },
