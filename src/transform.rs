@@ -23,6 +23,13 @@ impl TransformContext {
         }
     }
 
+    pub fn merge(&self, other: &TransformContext) -> TransformContext {
+        TransformContext {
+            x: self.x + other.x,
+            y: self.y + other.y
+        }
+    }
+
     pub fn fill_rect<R: Into<Option<Rect>>, T: RenderTarget>(&self, canvas: &mut Canvas<T>, rect: R) -> Result<(), String> {
         match rect.into() {
             Some(rect) => {
