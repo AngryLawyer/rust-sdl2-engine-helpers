@@ -1,4 +1,6 @@
 extern crate sdl2;
+#[cfg(feature="opengl")]
+extern crate gl;
 
 pub mod event_bus;
 pub mod game_loop;

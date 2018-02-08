@@ -5,8 +5,9 @@ authors = ["Tony Aldridge <zaragopha@hotmail.com>"]
 
 [features]
 default = []
-opengl = ["gl"]
+# opengl = ["gl"]
 
 [dependencies]
 sdl2 = "0.31"
-gl = { version = "0.10.0", optional = true }
+# gl = { version = "0.10.0", optional = true }
+gl = { version = "0.10.0" }
