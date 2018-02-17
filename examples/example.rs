@@ -6,21 +6,16 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
-use sdl2_engine_helpers::simplegl::{SimpleGl, ClearFlags};
+use sdl2_engine_helpers::simplegl::{SimpleGlBuilder, ClearFlags};
 
 pub fn main() {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
-    let window = video_subsystem.window("Example", 800, 600)
+    let (simplegl, mut canvas) = video_subsystem.window("Example", 800, 600)
         .position_centered()
-        .opengl()
-        .build()
-        .unwrap();
+        .simple_gl(&video_subsystem);
 
-    let mut canvas = window.into_canvas().build().unwrap();
-
-    let simplegl = SimpleGl::initialize(&canvas, &video_subsystem).expect("SimpleGL initialization failed");
     simplegl.clear_color(1.0, 1.0, 1.0, 1.0);
     simplegl.clear(ClearFlags::COLOR_BUFFER);
 
