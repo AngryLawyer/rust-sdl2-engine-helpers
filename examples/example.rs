@@ -12,14 +12,14 @@ pub fn main() {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
-    let (simplegl, mut canvas) = video_subsystem.window("Example", 800, 600)
+    let mut simplegl = video_subsystem.window("Example", 800, 600)
         .position_centered()
         .simple_gl(&video_subsystem);
 
     simplegl.clear_color(1.0, 1.0, 1.0, 1.0);
     simplegl.clear(ClearFlags::COLOR_BUFFER);
 
-    canvas.present();
+    simplegl.canvas().present();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
     'running: loop {
