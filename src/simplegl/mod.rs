@@ -4,6 +4,8 @@ use sdl2::{VideoSubsystem};
 use sdl2::render::Canvas;
 use sdl2::video::{Window, WindowBuilder};
 
+pub mod buffers;
+
 bitflags! {
     pub struct ClearFlags: u32 {
         const COLOR_BUFFER = gl::COLOR_BUFFER_BIT;
