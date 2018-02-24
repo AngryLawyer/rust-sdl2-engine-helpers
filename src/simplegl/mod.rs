@@ -5,6 +5,9 @@ use sdl2::render::Canvas;
 use sdl2::video::{Window, WindowBuilder};
 
 pub mod buffers;
+pub mod shaders;
+pub mod programs;
+pub mod textures;
 
 bitflags! {
     pub struct ClearFlags: u32 {

@@ -1,5 +1,6 @@
 extern crate sdl2;
 extern crate gl;
+extern crate image;
 
 #[macro_use]
 extern crate bitflags;
