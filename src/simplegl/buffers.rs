@@ -46,7 +46,7 @@ impl Buffer {
             gl::BindVertexArray(buffer.vao_id);
 
             gl::BindBuffer(gl::ARRAY_BUFFER, buffer.vbo_id);
-            gl::BufferData(gl::ARRAY_BUFFER, (buffer.buffer_data.len() * mem::size_of::<GLfloat>()) as isize, buffer.buffer_data.as_ptr() as *const c_void, gl::STATIC_DRAW);  // TODO: This shouldn't always be FLOAT
+            gl::BufferData(gl::ARRAY_BUFFER, (buffer.buffer_data.len() * mem::size_of::<GLfloat>()) as isize, buffer.buffer_data.as_ptr() as *const c_void, gl::STATIC_DRAW);  // TODO: This shouldn't always be FLOAT. Or STATIC_DRAW
 
 
             match buffer.indices {
