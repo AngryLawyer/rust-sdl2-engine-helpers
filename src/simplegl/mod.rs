@@ -3,6 +3,7 @@ use sdl2;
 use sdl2::{VideoSubsystem};
 use sdl2::render::Canvas;
 use sdl2::video::{Window, WindowBuilder};
+use sdl2::video::GLProfile;
 
 pub mod buffers;
 pub mod shaders;
@@ -32,12 +33,18 @@ pub trait SimpleGlBuilder {
 
 impl SimpleGlBuilder for WindowBuilder {
     fn simple_gl(&mut self, video: &VideoSubsystem) -> SimpleGl {
+
+        let gl_attr = video.gl_attr();
+        gl_attr.set_context_profile(GLProfile::Core);
+        gl_attr.set_context_version(3, 3);
+
         // TODO: proper error handling
         self.opengl();
         let window = self.build().unwrap();
-        let canvas = window.into_canvas().build().unwrap();
+        let canvas = window.into_canvas().index(find_sdl_gl_driver().unwrap()).build().unwrap();
         gl::load_with(|name| video.gl_get_proc_address(name) as *const _);
         canvas.window().gl_set_context_to_current().unwrap();
+
         SimpleGl {
             canvas
         }
