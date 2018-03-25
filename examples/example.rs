@@ -34,10 +34,6 @@ void main()
         .position_centered()
         .simple_gl(&video_subsystem);
 
-    simplegl.clear_color(1.0, 1.0, 1.0, 1.0);
-    simplegl.clear(ClearFlags::COLOR_BUFFER);
-
-    simplegl.canvas().present();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
     let vertex_shader = Shader::new(vertex_shader_raw, ShaderType::VertexShader).unwrap();
@@ -50,6 +46,9 @@ void main()
     ], vec![BufferSectionLength::Length3], None);
 
     'running: loop {
+        simplegl.clear_color(1.0, 1.0, 1.0, 1.0);
+        simplegl.clear(ClearFlags::COLOR_BUFFER);
+        simplegl.window().gl_swap_window();
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit {..} | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
